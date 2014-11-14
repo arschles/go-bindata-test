@@ -7,6 +7,11 @@ import (
 )
 
 func main() {
+  lorem, err := Asset("static/textfiles/loremipsum.txt")
+  if err != nil {
+    log.Fatalf(err.Error())
+  }
+
   tmpl, err := GetTemplate("index", "static/templates/index.tmpl")
   if err != nil {
     log.Fatalf(err.Error())
@@ -21,9 +26,11 @@ func main() {
     if len(title) == 0 {
       title = "Hello World!"
     }
+    text := string(lorem)
     tmpl.Execute(res, map[string]string{
       "Title": title,
       "Name": name,
+      "Text": text,
     })
   }
   http.HandleFunc("/", indexHandler)

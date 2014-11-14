@@ -1,3 +1,3 @@
 #!/bin/bash
-go-bindata static/templates
+go-bindata static/...
 go build .
