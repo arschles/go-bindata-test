@@ -2,18 +2,15 @@ package main
 
 import (
   "log"
-  "html/template"
   "net/http"
   "fmt"
 )
 
 func main() {
-  tmplBytes, err := Asset("static/templates/index.tmpl")
+  tmpl, err := GetTemplate("index", "static/templates/index.tmpl")
   if err != nil {
     log.Fatalf(err.Error())
   }
-  tmplStr := string(tmplBytes)
-  tmpl := template.Must(template.New("index").Parse(tmplStr))
 
   indexHandler := func(res http.ResponseWriter, req *http.Request) {
     name := req.URL.Query().Get("name")
