@@ -4,6 +4,7 @@ import (
   "log"
   "net/http"
   "fmt"
+  "github.com/arschles/go-bindata-test/html/template"
 )
 
 func main() {
@@ -12,7 +13,7 @@ func main() {
     log.Fatalf(err.Error())
   }
 
-  tmpl, err := GetTemplate("index", "static/templates/index.tmpl")
+  tmpl, err := template.New("index", Asset).Parse("static/templates/index.tmpl")
   if err != nil {
     log.Fatalf(err.Error())
   }
