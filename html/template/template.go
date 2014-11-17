@@ -1,4 +1,4 @@
-package templatefs
+package template
 
 import (
   "html/template"
@@ -21,47 +21,50 @@ func (t *Template) Name() string {
 }
 
 func (t *Template) Funcs(funcMap template.FuncMap) *Template {
-  return t.tmpl.Funcs(funcMap)
+  return t.replaceTmpl(t.tmpl.Funcs(funcMap))
 }
 
 func (t *Template) Parse(filename string) (*Template, error) {
-  tmplStr, err := t.file(filename)
+  tmplBytes, err := t.file(filename)
   if err != nil {
     return nil, err
   }
-  newTmpl, err := t.tmpl.Parse(tmplStr)
+  newTmpl, err := t.tmpl.Parse(string(tmplBytes))
   if err != nil {
     return nil, err
   }
-  t.tmpl := newTmpl
-  return t, nil
+  return t.replaceTmpl(newTmpl), nil
 }
 
 func (t *Template) ParseFiles(filenames ...string) (*Template, error) {
-  fileStrs := []string{}
+  fileBytes := []byte{}
   for _, filename := range filenames {
-    fileStr, err := t.file(filename)
+    tmplBytes, err := t.file(filename)
     if err != nil {
       return nil, err
     }
-    fileStrs = append(fileStrs, fileStr)
+    fileBytes = append(fileBytes, tmplBytes...)
   }
-  newTmpl, err := t.tmpl.ParseFiles(fileStrs...)
+  newTmpl, err := t.tmpl.Parse(string(fileBytes))
   if err != nil {
     return nil, err
   }
-  t.tmpl = newTmpl
-  return t, nil
+  return t.replaceTmpl(newTmpl), nil
 }
 
 func (t *Template) Execute(w io.Writer, data interface{}) error {
   return t.tmpl.Execute(w, data)
 }
 
-func (t *Template) file(name string) ([]byte, error) {
-  tmplBytes, err := Asset(fileName)
+func (t *Template) replaceTmpl(tmpl *template.Template) *Template {
+  t.tmpl = tmpl
+  return t
+}
+
+func (t *Template) file(fileName string) ([]byte, error) {
+  tmplBytes, err := t.AssetFunc(fileName)
   if err != nil {
     return nil, err
   }
-  return string(tmplBytes), nil
+  return tmplBytes, nil
 }
